@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизация - CortexClient</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head>
+<body>
+    <div class="background-animation">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <header>
+        <div class="container">
+            <nav>
+                <a href="index.html" class="logo">
+                    <img src="logo.png" alt="Cortex Logo">
+                    CortexClient
+                </a>
+                <div class="nav-links">
+                    <a href="index.html">На главную</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container auth-container">
+        <div class="glass-panel auth-box">
+            <h2 style="text-align: center; margin-bottom: 30px;">Вход в систему</h2>
+
+            <form action="#" method="POST">
+                <div class="form-group">
+                    <label for="login">Логин</label>
+                    <input type="text" id="login" name="login" required placeholder="Введите логин">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Пароль</label>
+                    <input type="password" id="password" name="password" required placeholder="Введите пароль">
+                </div>
+
+                <div class="g-recaptcha" data-sitekey="6Ld_K28sAAAAAG4ZXkuF4DmTitZqwpVSvxOGKHPk"></div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Войти</button>
+            </form>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <span style="color: var(--text-muted);">Нет аккаунта?</span>
+                <a href="register.html" style="color: var(--primary-color); text-decoration: none;">Регистрация</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация - CortexClient</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head>
+<body>
+    <div class="background-animation">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <header>
+        <div class="container">
+            <nav>
+                <a href="index.html" class="logo">
+                    <img src="logo.png" alt="Cortex Logo">
+                    CortexClient
+                </a>
+                <div class="nav-links">
+                    <a href="index.html">На главную</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container auth-container">
+        <div class="glass-panel auth-box">
+            <h2 style="text-align: center; margin-bottom: 30px;">Создать аккаунт</h2>
+
+            <form action="#" method="POST">
+                <div class="form-group">
+                    <label for="reg-login">Придумайте логин</label>
+                    <input type="text" id="reg-login" name="login" required placeholder="Введите логин">
+                </div>
+
+                <div class="form-group">
+                    <label for="reg-email">Электронная почта</label>
+                    <input type="email" id="reg-email" name="email" required placeholder="example@mail.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="reg-password">Придумайте пароль</label>
+                    <input type="password" id="reg-password" name="password" required placeholder="Минимум 6 символов">
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm-password">Повторите пароль</label>
+                    <input type="password" id="confirm-password" name="confirm-password" required placeholder="Введите пароль еще раз">
+                </div>
+
+                <div class="g-recaptcha" data-sitekey="6Ld_K28sAAAAAG4ZXkuF4DmTitZqwpVSvxOGKHPk" style="margin-bottom: 20px;"></div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Зарегистрироваться</button>
+            </form>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <span style="color: var(--text-muted);">Уже есть аккаунт?</span>
+                <a href="auth.html" style="color: var(--primary-color); text-decoration: none;">Войти</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
