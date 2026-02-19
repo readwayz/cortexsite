@@ -388,6 +388,16 @@
             z-index: -1;
             pointer-events: none;
         }
+
+        /* Стили для возвращенного текста логотипа */
+        .logo-text {
+            color: #ffffff;
+            font-size: 22px;
+            font-weight: 800;
+            margin-left: 10px;
+            vertical-align: middle;
+            letter-spacing: -0.5px;
+        }
     </style>
 </head>
 <body>
@@ -409,9 +419,9 @@
     <header>
         <div class="container">
             <nav>
-                <a href="index.html" class="logo">
-                    <img src="logo.png" alt="Cortex Logo">
-                    CortexClient
+                <a href="index.html" class="logo" style="display: flex; align-items: center; text-decoration: none;">
+                    <img src="logo.png" alt="Cortex Logo" style="height: 32px; width: auto;">
+                    <span class="logo-text">CortexClient</span>
                 </a>
                 <div class="nav-links">
                     <a href="index.html">Главная</a>
@@ -426,7 +436,7 @@
 
     <main class="container">
         <section class="hero">
-            <h1>CortexClient</h1>
+            <img src="text.gif" alt="CortexClient Title" style="max-width: 800px; width: 150%; height: auto; margin-bottom: -20px;">
             <p>Лучшее DLC для комфортной игры в Minecraft. Стиль, удобство и максимальная производительность.</p>
 
             <div class="hero-buttons">
