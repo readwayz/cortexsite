@@ -1,13 +1,41 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация - CortexClient</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Исправление наложения фона */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        header, .auth-container {
+            position: relative;
+            z-index: 10;
+        }
+    </style>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
+    <canvas id="particles-canvas"></canvas>
     <div class="background-animation">
         <div class="orb orb-1"></div>
         <div class="orb orb-2"></div>
@@ -64,5 +92,62 @@
             </div>
         </div>
     </div>
+
+    <script>
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = [];
+
+        function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+        constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 0.5;
+        this.speedX = Math.random() * 0.5 - 0.25;
+        this.speedY = Math.random() * 0.5 - 0.25;
+        this.opacity = Math.random() * 0.5 + 0.2;
+        }
+        update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.x > canvas.width) this.x = 0;
+        else if (this.x < 0) this.x = canvas.width;
+        if (this.y > canvas.height) this.y = 0;
+        else if (this.y < 0) this.y = canvas.height;
+        }
+        draw() {
+        ctx.fillStyle = `rgba(99, 102, 241, ${this.opacity})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        }
+        }
+
+        function initParticles() {
+        particlesArray = [];
+        for (let i = 0; i < 100; i++) {
+        particlesArray.push(new Particle());
+        }
+        }
+
+        function animateParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particlesArray.length; i++) {
+        particlesArray[i].update();
+        particlesArray[i].draw();
+        }
+        requestAnimationFrame(animateParticles);
+        }
+        initParticles();
+        animateParticles();
+    </script>
 </body>
 </html>
