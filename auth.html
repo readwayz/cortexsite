@@ -5,12 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Авторизация - CortexClient</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <style>
+        /* Исправление наложения фона */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        header, .auth-container {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Стили для кастомной галочки (заглушка вместо капчи) */
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 14px;
+            user-select: none;
+        }
+
+            .remember-me input {
+                display: none;
+            }
+
+        .checkbox-custom {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .remember-me input:checked + .checkbox-custom {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+
+        .checkbox-custom::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            display: none;
+        }
+
+        .remember-me input:checked + .checkbox-custom::after {
+            display: block;
+        }
+    </style>
 </head>
 <body>
+    <canvas id="particles-canvas"></canvas>
     <div class="background-animation">
         <div class="orb orb-1"></div>
         <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
     </div>
 
     <header>
@@ -31,7 +106,7 @@
         <div class="glass-panel auth-box">
             <h2 style="text-align: center; margin-bottom: 30px;">Вход в систему</h2>
 
-            <form action="#" method="POST">
+            <form id="loginForm" action="#" method="POST">
                 <div class="form-group">
                     <label for="login">Логин</label>
                     <input type="text" id="login" name="login" required placeholder="Введите логин">
@@ -42,9 +117,13 @@
                     <input type="password" id="password" name="password" required placeholder="Введите пароль">
                 </div>
 
-                <div class="g-recaptcha" data-sitekey="6LemR28sAAAAABXDHvYSwuEd1ebKomE9_a35pB0m"></div>
+                <label class="remember-me">
+                    <input type="checkbox" id="remember">
+                    <div class="checkbox-custom"></div>
+                    Запомнить меня на этом устройстве
+                </label>
 
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Войти</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Войти</button>
             </form>
 
             <div style="text-align: center; margin-top: 20px;">
@@ -53,6 +132,80 @@
             </div>
         </div>
     </div>
-</body>
 
+    <script>
+        // --- АНИМАЦИЯ ЧАСТИЦ ---
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = [];
+
+        function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+        constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 0.5;
+        this.speedX = Math.random() * 0.5 - 0.25;
+        this.speedY = Math.random() * 0.5 - 0.25;
+        this.opacity = Math.random() * 0.5 + 0.2;
+        }
+        update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.x > canvas.width) this.x = 0;
+        else if (this.x < 0) this.x = canvas.width;
+        if (this.y > canvas.height) this.y = 0;
+        else if (this.y < 0) this.y = canvas.height;
+        }
+        draw() {
+        ctx.fillStyle = `rgba(99, 102, 241, ${this.opacity})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        }
+        }
+
+        function initParticles() {
+        particlesArray = [];
+        for (let i = 0; i < 100; i++) {
+        particlesArray.push(new Particle());
+        }
+        }
+
+        function animateParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particlesArray.length; i++) {
+        particlesArray[i].update();
+        particlesArray[i].draw();
+        }
+        requestAnimationFrame(animateParticles);
+        }
+        initParticles();
+        animateParticles();
+
+        // --- ЛОГИКА ВХОДА ---
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const login = document.getElementById('login').value;
+        const pass = document.getElementById('password').value;
+
+        // Простая проверка заглушки (admin/admin)
+        if (login === 'admin' && pass === 'admin') {
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('currentUser', login);
+        window.location.href = 'dashboard.html';
+        } else {
+        alert('Ошибка! Попробуйте Логин: admin, Пароль: admin');
+        }
+        });
+    </script>
+</body>
 </html>
