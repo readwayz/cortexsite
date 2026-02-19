@@ -1,0 +1,437 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет - CortexClient</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Интеграция стилей из index.html */
+        :root {
+            --primary-color: #6366f1;
+            --accent-pink: #ff00ff;
+            --panel-bg: rgba(15, 15, 20, 0.95);
+            --panel-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background-color: #050508;
+            margin: 0;
+            overflow-x: hidden;
+            color: white;
+        }
+
+        /* Фоновые сферы как на главной */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: radial-gradient(circle at 50% 50%, #0a0a15 0%, #050508 100%);
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            mix-blend-mode: screen;
+            animation: float-orb 20s infinite alternate ease-in-out;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: rgba(99, 102, 241, 0.3);
+            top: -10%;
+            left: -10%;
+        }
+
+        .orb-2 {
+            width: 600px;
+            height: 600px;
+            background: rgba(139, 92, 246, 0.2);
+            bottom: -20%;
+            right: -10%;
+        }
+
+        @keyframes float-orb {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            100% {
+                transform: translate(100px, 50px) scale(1.1);
+            }
+        }
+
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Контейнер личного кабинета */
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 25px;
+            max-width: 1100px;
+            margin: 120px auto 50px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Левая панель */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .profile-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 24px;
+            padding: 30px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .avatar-circle {
+            width: 90px;
+            height: 90px;
+            background: rgba(99, 102, 241, 0.1);
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nav-item {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            padding: 16px 20px;
+            border-radius: 15px;
+            color: #ccc;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+        }
+
+            .nav-item:hover {
+                border-color: var(--primary-color);
+                color: white;
+                transform: translateX(5px);
+            }
+
+            .nav-item.active {
+                background: linear-gradient(90deg, rgba(99, 102, 241, 0.15), transparent);
+                border-left: 4px solid var(--primary-color);
+                color: white;
+            }
+
+        .btn-exit {
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+            .btn-exit:hover {
+                border-color: #ef4444;
+                background: rgba(239, 68, 68, 0.05);
+            }
+
+        /* Правая панель (ФИКСИРОВАННАЯ ВЫСОТА) */
+        .content-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 24px;
+            height: 600px; /* Фиксированный размер */
+            padding: 40px;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+            /* Тонкий скроллбара */
+            .content-panel::-webkit-scrollbar {
+                width: 4px;
+            }
+
+            .content-panel::-webkit-scrollbar-thumb {
+                background: var(--primary-color);
+                border-radius: 10px;
+            }
+
+        .tab-content {
+            display: none;
+        }
+
+            .tab-content.active {
+                display: block;
+                animation: fadeIn 0.5s ease forwards;
+            }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Элементы внутри контента */
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 18px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .data-label {
+            color: #888;
+        }
+
+        .data-value {
+            font-weight: 500;
+        }
+
+        .sub-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--panel-border);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-tag {
+            font-size: 0.85rem;
+            padding: 4px 12px;
+            border-radius: 8px;
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        /* Стилизация инпутов под стиль сайта */
+        .dash-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--panel-border);
+            padding: 15px;
+            border-radius: 12px;
+            color: white;
+            margin-top: 25px;
+            outline: none;
+        }
+
+            .dash-input:focus {
+                border-color: var(--primary-color);
+            }
+
+        .full-btn {
+            width: 100%;
+            margin-top: 15px;
+            padding: 16px;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particles-canvas"></canvas>
+
+    <div class="background-animation">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <header>
+        <div class="container">
+            <nav>
+                <a href="index.html" class="logo">
+                    <img src="logo.png" alt="Cortex Logo">
+                    CortexClient
+                </a>
+                <div class="nav-links">
+                    <a href="index.html">На главную</a>
+                    <a href="https://t.me/cortexclient_com" target="_blank">Поддержка</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <div class="sidebar">
+            <div class="profile-card">
+                <div class="avatar-circle">👤</div>
+                <h3 id="userNameDisplay">Admin</h3>
+                <p style="color: #6366f1; font-size: 0.8rem; margin-top: 5px;">UID: 0001</p>
+            </div>
+
+            <div class="nav-menu">
+                <div class="nav-item active" onclick="openTab(event, 'profile')"><span>👤</span> Профиль</div>
+                <div class="nav-item" onclick="openTab(event, 'referral')"><span>💎</span> Рефералы</div>
+                <div class="nav-item" onclick="openTab(event, 'download')"><span>🚀</span> Загрузки</div>
+                <a href="auth.html" class="nav-item btn-exit"><span>🚪</span> Выйти</a>
+            </div>
+        </div>
+
+        <div class="content-panel">
+
+            <div id="profile" class="tab-content active">
+                <h2 style="font-size: 1.8rem; margin-bottom: 25px;">Мой аккаунт</h2>
+
+                <div class="data-row">
+                    <span class="data-label">Электронная почта</span>
+                    <span class="data-value">admin@admin.com</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Дата регистрации</span>
+                    <span class="data-value">01.01.2026</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Текущая роль</span>
+                    <span class="data-value" style="color: var(--primary-color);">Пользователь</span>
+                </div>
+                <div class="data-row" style="border: none;">
+                    <span class="data-label">Баланс</span>
+                    <span class="data-value">0.00 ₽</span>
+                </div>
+
+                <h3 style="margin-top: 40px; font-size: 1.2rem;">Активные подписки</h3>
+
+                <div class="sub-box">
+                    <span>Cortex Legit</span>
+                    <span class="status-tag">Не куплено</span>
+                </div>
+
+                <div class="sub-box">
+                    <span>Cortex ProstoCraft</span>
+                    <span class="status-tag">Не куплено</span>
+                </div>
+
+                <div class="sub-box">
+                    <span>Cortex Extreme</span>
+                    <span class="status-tag">Не куплено</span>
+                </div>
+
+                <input type="text" class="dash-input" placeholder="Введите лицензионный ключ">
+                <button class="btn btn-primary full-btn">Активировать</button>
+            </div>
+
+            <div id="referral" class="tab-content">
+                <h2>Реферальная система</h2>
+                <p style="color: #888; margin: 15px 0 30px;">Зарабатывайте, приглашая новых пользователей.</p>
+
+                <div class="sub-box" style="background: rgba(99, 102, 241, 0.05); border-color: var(--primary-color);">
+                    <div>
+                        <div style="font-size: 0.8rem; color: #aaa;">Ваш промокод</div>
+                        <div style="font-size: 1.2rem; font-weight: 700; color: #fff;">CORTEX-0001</div>
+                    </div>
+                    <button class="btn btn-secondary" style="padding: 8px 15px; font-size: 0.8rem;">Копировать</button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 25px;">
+                    <div class="sub-box" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+                        <span style="color: #888; font-size: 0.8rem;">Всего приглашено</span>
+                        <span style="font-size: 1.5rem; font-weight: 700;">0</span>
+                    </div>
+                    <div class="sub-box" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+                        <span style="color: #888; font-size: 0.8rem;">Доступно к выводу</span>
+                        <span style="font-size: 1.5rem; font-weight: 700; color: #00ff88;">0.00 ₽</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="download" class="tab-content" style="text-align: center; padding-top: 40px;">
+                <div style="font-size: 4rem; margin-bottom: 20px;">📦</div>
+                <h2>Скачать лоадер</h2>
+                <p style="color: #888; max-width: 400px; margin: 15px auto 30px;">Для использования DLC необходимо скачать и запустить наш официальный лоадер.</p>
+
+                <div style="background: rgba(255,255,255,0.02); border: 1px dashed var(--panel-border); padding: 30px; border-radius: 20px;">
+                    <p style="margin-bottom: 20px;">Последняя версия: <b>Alpha</b></p>
+                    <button class="btn btn-primary" style="padding: 15px 40px;">Скачать для Windows</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Переключение вкладок
+        function openTab(evt, tabName) {
+        const contents = document.getElementsByClassName("tab-content");
+        for (let i = 0; i < contents.length; i++) contents[i].classList.remove("active");
+
+        const items = document.getElementsByClassName("nav-item");
+        for (let i = 0; i < items.length; i++) items[i].classList.remove("active");
+
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+        }
+
+        // Частицы (код с твоей главной страницы)
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = [];
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+        constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2;
+        this.speedX = Math.random() * 0.5 - 0.25;
+        this.speedY = Math.random() * 0.5 - 0.25;
+        }
+        update() {
+        this.x += this.speedX; this.y += this.speedY;
+        if (this.x > canvas.width) this.x = 0; else if (this.x < 0) this.x = canvas.width;
+        if (this.y > canvas.height) this.y = 0; else if (this.y < 0) this.y = canvas.height;
+        }
+        draw() {
+        ctx.fillStyle = 'rgba(99, 102, 241, 0.3)';
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+        }
+        }
+
+        function init() { for (let i = 0; i < 80; i++) particlesArray.push(new Particle()); }
+        function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particlesArray.forEach(p => { p.update(); p.draw(); });
+        requestAnimationFrame(animate);
+        }
+        init(); animate();
+    </script>
+</body>
+</html>
